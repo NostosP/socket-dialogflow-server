@@ -4,17 +4,18 @@ var express = require('express'),
     io = require('socket.io')(server),
     cors = require('cors'),
     port = process.env.PORT || 3000,
+    bodyParser = require('body-parser'),
     dialogflow = require('./dialogflow'),
     fcm = require('./fcm');
 
 // For Chrome issues
 app.use(cors());
 
-io.on('connection', (socket) => {
+// To read request body
+app.use(bodyParser.json());
 
-    console.log('user connected');  
-    
-    socket.on('debug', text => console.log(text));
+// Socket handling
+io.on('connection', (socket) => {
 
     socket.on('set-nickname', nickname => {
         console.log(nickname+' connected');
@@ -35,14 +36,17 @@ io.on('connection', (socket) => {
     socket.on('set-token', token => {
         fcm.setToken(token);
     })
-
-    socket.on('receive-notification', () => {
-        setTimeout(() => {
-            fcm.sendPushNotification();
-        }, 8000);
-    })
     
 });
+
+// Back-end handling
+app.post('/pushNotification', function (req, res) {
+    fcm.sendPushNotification(req.body).then(
+        res.status(200).json('Notification sent!')
+    ).catch(
+        res.status(500).json('Error!')
+    );
+})
 
 server.listen(port, function(){
     console.log('Socket server listening in http://localhost:' + port);

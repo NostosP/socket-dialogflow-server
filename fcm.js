@@ -12,8 +12,8 @@ admin.initializeApp({
 // Default fcm message 
 var message = {
     notification: {
-        title: 'Prova notifica',
-        body: 'Prova notifica'
+        title: 'Default notification',
+        body: 'Default notification'
     },
     token: ''
 };
@@ -23,9 +23,10 @@ exports.setToken = function(token) {
     console.log(registrationToken);
 }
 
-exports.sendPushNotification = function() {
+exports.sendPushNotification = async function(req) {
     message.token = registrationToken;
-    console.log(message);
+    message.notification.title = req.title;
+    message.notification.body = req.body;
     admin.messaging().send(message)
         .then((response) => {
             // Response is a message ID string.
