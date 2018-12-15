@@ -2,40 +2,41 @@ const dialogflow = require('dialogflow');
 const uuid = require('uuid');
 
 /**
- * Send a query to the dialogflow agent, and return the query result.
- * @param {string} projectId The project to be used
+ * Sends a query to the dialogflow agent, and returns the query result.
+ * @param clientRequest
  */
-module.exports = async function (message) {
+module.exports = async function (clientRequest) {
     // A unique identifier for the given session
     const sessionId = uuid.v4();
+    // From Firebase console
     const projectId = 'tesiagent-5723f';
     
 
-    // Create a new session
+    // Creates a new session
     const sessionClient = new dialogflow.SessionsClient();
     const sessionPath = sessionClient.sessionPath(projectId, sessionId);
 
-    // Create new default message
+    // Default server response
     const response = {
         body: '',
         from: 'ChatBot',
         type: "text"
     }
 
-    // The text query request.
+    // Text query request
     const request = {
         session: sessionPath,
         queryInput: {
             text: {
                 // The query to send to the dialogflow agent
-                text: message.body,
+                text: clientRequest.body,
                 // The language used by the client (en-US)
                 languageCode: 'en-US',
             },
         },
     };
 
-    // Send request and log result
+    // Sends request and logs result
     const responses = await sessionClient.detectIntent(request);
     console.log('Detected intent');
     const result = responses[0].queryResult;
@@ -47,7 +48,7 @@ module.exports = async function (message) {
         console.log(`  No intent matched.`);
     }
 
-    // Finalize message to send to client based on intent
+    // Finalizes the message to send to the client based on the agent intent
     if (result.intent.displayName == 'Image Intent') {
         response.type = "image";
         response.body = result.fulfillmentMessages[0].card.imageUri;

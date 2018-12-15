@@ -11,7 +11,7 @@ var express = require('express'),
 // For Chrome issues
 app.use(cors());
 
-// To read request body
+// For json parsing
 app.use(bodyParser.json());
 
 // Socket handling
@@ -21,31 +21,30 @@ io.on('connection', (socket) => {
         console.log(nickname+' connected');
     })
     
-    socket.on('new-message', (message) => {
+    // Handles client requests
+    socket.on('new-client-request', (message) => {
         // io.emit('message', {body: 'Hello! I am sleeping right now, sorry!', from: 'ChatBot',
         //                     type: "text"})
         dialogflow(message).then(res => {
-            io.emit('message', res);  
+            io.emit('new-server-message', res);  
         }).catch(err => {
             console.log(err);
-            io.emit('message', {body: 'Something went wrong!', from: 'ChatBot',
+            io.emit('new-server-message', {body: 'Something went wrong!', from: 'ChatBot',
                                 type: "text"})
         })
     });
 
+    // Handles user's registration
     socket.on('set-token', token => {
         fcm.setToken(token);
     })
     
 });
 
-// Back-end handling
+// Handles notifications from the back-end
 app.post('/pushNotification', function (req, res) {
-    fcm.sendPushNotification(req.body).then(
-        res.status(200).json('Notification sent!')
-    ).catch(
-        res.status(500).json('Error!')
-    );
+    fcm.sendPushNotification(req.body);
+    res.status(200).json('Notification sent!');
 })
 
 server.listen(port, function(){

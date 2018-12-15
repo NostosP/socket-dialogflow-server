@@ -9,8 +9,8 @@ admin.initializeApp({
     databaseURL: "https://tesiagent-5723f.firebaseio.com"
 });
 
-// Default fcm message 
-var message = {
+// Default FCM notification message 
+var fcmMessage = {
     notification: {
         title: 'Default notification',
         body: 'Default notification'
@@ -18,16 +18,24 @@ var message = {
     token: ''
 };
 
-exports.setToken = function(token) {
+/**
+ * Saves the token of the client
+ * @param token
+ */
+exports.setToken = (token) => {
     registrationToken = token;
     console.log(registrationToken);
 }
 
-exports.sendPushNotification = async function(req) {
-    message.token = registrationToken;
-    message.notification.title = req.title;
-    message.notification.body = req.body;
-    admin.messaging().send(message)
+/**
+ * Takes the back-end notification and sends it to the client
+ * @param serverNotification
+ */
+exports.sendPushNotification = (serverNotification) => {
+    fcmMessage.token = registrationToken;
+    fcmMessage.notification.title = serverNotification.title;
+    fcmMessage.notification.body = serverNotification.body;
+    admin.messaging().send(fcmMessage)
         .then((response) => {
             // Response is a message ID string.
             console.log('Successfully sent message:', response);
