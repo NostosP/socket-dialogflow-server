@@ -1,22 +1,14 @@
 var admin = require('firebase-admin'),
     // Got from FCM console, project settings
     serviceAccount = require('./tesiagent-5723f-firebase-adminsdk-yo6ki-7dace2a8ef.json'),
-    registrationToken;
+    registrationToken,
+    fcmMsg = require('./models/fcmNotification');
 
 // FCM initializing, got from FCM console, project settings
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://tesiagent-5723f.firebaseio.com"
 });
-
-// Default FCM notification message 
-var fcmMessage = {
-    notification: {
-        title: 'Default notification',
-        body: 'Default notification'
-    },
-    token: ''
-};
 
 /**
  * Saves the token of the client
@@ -32,6 +24,7 @@ exports.setToken = (token) => {
  * @param serverNotification
  */
 exports.sendPushNotification = (serverNotification) => {
+    fcmMessage = fcmMsg.fcmMessage();
     fcmMessage.token = registrationToken;
     fcmMessage.notification.title = serverNotification.title;
     fcmMessage.notification.body = serverNotification.body;

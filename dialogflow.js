@@ -19,7 +19,7 @@ exports. sendMessage = async function(clientRequest) {
     const sessionClient = new dialogflow.SessionsClient();
     const sessionPath = sessionClient.sessionPath(projectId, sessionId);
 
-    const request = dialogflowReq.request;
+    const request = dialogflowReq.request();
     request.session = sessionPath;
     request.queryInput.text.text = clientRequest.body
 
@@ -36,7 +36,7 @@ exports. sendMessage = async function(clientRequest) {
     }
 
     // Constructs the message to send to the client based on the agent intent
-    var response = clientRes.response;
+    var response = clientRes.response();
     if (result.intent.displayName == 'Image Intent') {
         response.type = 'image';
         response.body = result.fulfillmentMessages[0].card.imageUri;

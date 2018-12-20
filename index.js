@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
             io.emit('new-server-message', res);  
         }).catch(err => {
             console.log(err);
-            io.emit('new-server-message', clientRes.errorResponse)
+            io.emit('new-server-message', clientRes.errorResponse())
         })
     });
 
