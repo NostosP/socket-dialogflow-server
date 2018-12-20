@@ -7,6 +7,7 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     dialogflow = require('./dialogflow'),
     fcm = require('./fcm');
+    clientRes = require('./models/clientResponse');
 
 // For Chrome issues
 app.use(cors());
@@ -23,14 +24,12 @@ io.on('connection', (socket) => {
     
     // Handles client requests
     socket.on('new-client-request', (message) => {
-        // io.emit('message', {body: 'Hello! I am sleeping right now, sorry!', from: 'ChatBot',
-        //                     type: "text"})
-        dialogflow(message).then(res => {
+        dialogflow.sendMessage(message).then(res => {
+            console.log(JSON.stringify(res, null, 2))
             io.emit('new-server-message', res);  
         }).catch(err => {
             console.log(err);
-            io.emit('new-server-message', {body: 'Something went wrong!', from: 'ChatBot',
-                                type: "text"})
+            io.emit('new-server-message', clientRes.errorResponse)
         })
     });
 
