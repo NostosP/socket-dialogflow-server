@@ -9,6 +9,8 @@ var express = require('express'),
     fcm = require('./fcm');
     clientRes = require('./models/clientResponse');
 
+var fcmToken;
+
 // For Chrome issues
 app.use(cors());
 
@@ -24,8 +26,8 @@ io.on('connection', (socket) => {
     
     // Handles client requests
     socket.on('new-client-request', (message) => {
-        dialogflow.sendMessage(message).then(res => {
-            console.log(JSON.stringify(res, null, 2))
+        dialogflow.sendMessage(message, fcmToken).then(res => {
+            // console.log(JSON.stringify(res, null, 2))
             io.emit('new-server-message', res);  
         }).catch(err => {
             console.log(err);
@@ -35,7 +37,9 @@ io.on('connection', (socket) => {
 
     // Handles user's registration
     socket.on('set-token', token => {
+        fcmToken = token;
         fcm.setToken(token);
+        console.log(token);
     })
     
 });

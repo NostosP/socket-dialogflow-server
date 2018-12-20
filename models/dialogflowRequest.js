@@ -12,6 +12,17 @@ exports.request = function() {
                 languageCode: 'en-US',
             },
         },
+        queryParams: {
+            timeZone: 'tuma',
+            payload: {
+                fields: {
+                    token: {
+                        stringValue: 'token',
+                        kind: 'stringValue'
+                    }
+                }
+            }           
+        }
     }
     return req;
 }

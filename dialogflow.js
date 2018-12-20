@@ -10,7 +10,7 @@ const projectId = 'tesiagent-5723f';
  * Sends a query to the dialogflow agent, and returns the query result.
  * @param clientRequest
  */
-exports. sendMessage = async function(clientRequest) {
+exports. sendMessage = async function(clientRequest, firebaseToken) {
 
     // A unique identifier for the given session
     const sessionId = uuid.v4();
@@ -22,6 +22,8 @@ exports. sendMessage = async function(clientRequest) {
     const request = dialogflowReq.request();
     request.session = sessionPath;
     request.queryInput.text.text = clientRequest.body
+    request.queryParams.payload.fields.token.stringValue = firebaseToken;
+    console.log(JSON.stringify(request, null, 2));
 
     // Sends request and logs result
     const responses = await sessionClient.detectIntent(request);
