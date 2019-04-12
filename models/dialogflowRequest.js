@@ -13,7 +13,7 @@ exports.request = function() {
             },
         },
         queryParams: {
-            timeZone: 'tuma',
+            timeZone: 'asd',
             payload: {
                 fields: {
                     token: {

@@ -16,7 +16,6 @@ admin.initializeApp({
  */
 exports.setToken = (token) => {
     registrationToken = token;
-    console.log(registrationToken);
 }
 
 /**

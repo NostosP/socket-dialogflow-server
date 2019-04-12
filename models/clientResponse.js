@@ -1,10 +1,12 @@
+const bot = 'ChatBot';
+
 /**
  * Default client response
  */
 exports.response = function() {
     var message = {
         body: '',
-        from: 'ChatBot',
+        from: bot,
         type: ''
     }
     return message;
@@ -16,7 +18,7 @@ exports.response = function() {
 exports.errorResponse = function() {
     var message = {
         body: 'Something went wrong!',
-        from: 'ChatBot',
+        from: bot,
         type: 'text'
     }
     return message;

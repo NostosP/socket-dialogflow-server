@@ -21,7 +21,7 @@ exports. sendMessage = async function(clientRequest, firebaseToken) {
 
     const request = dialogflowReq.request();
     request.session = sessionPath;
-    request.queryInput.text.text = clientRequest.body
+    request.queryInput.text.text = clientRequest.body;
     request.queryParams.payload.fields.token.stringValue = firebaseToken;
     console.log(JSON.stringify(request, null, 2));
 

@@ -1,7 +1,7 @@
 var express = require('express'),
     app = express(),
-    server = require('http').Server(app),
-    io = require('socket.io')(server),
+    logger = require('morgan'),
+    methodOverride = require('method-override'),
     cors = require('cors'),
     port = process.env.PORT || 3000,
     bodyParser = require('body-parser'),
@@ -11,38 +11,36 @@ var express = require('express'),
 
 var fcmToken;
 
-// For Chrome issues
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(methodOverride());
 app.use(cors());
 
-// For json parsing
-app.use(bodyParser.json());
 
-// Socket handling
-io.on('connection', (socket) => {
+// // Socket handling
+// io.origins("*:*");
 
-    socket.on('set-nickname', nickname => {
-        console.log(nickname+' connected');
-    })
+// io.on('connection', (socket) => {
     
-    // Handles client requests
-    socket.on('new-client-request', (message) => {
-        dialogflow.sendMessage(message, fcmToken).then(res => {
-            // console.log(JSON.stringify(res, null, 2))
-            io.emit('new-server-message', res);  
-        }).catch(err => {
-            console.log(err);
-            io.emit('new-server-message', clientRes.errorResponse())
-        })
-    });
+//     // Handles client requests
+//     socket.on('new-message', (message) => {
+//         console.log("User's message: " + JSON.stringify(message));
+//         dialogflow.sendMessage(message, fcmToken).then(res => {
+//             io.emit('new-server-message', res);  
+//         }).catch(err => {
+//             console.log(err);
+//             io.emit('new-server-message', clientRes.errorResponse())
+//         })
+//     });
 
-    // Handles user's registration
-    socket.on('set-token', token => {
-        fcmToken = token;
-        fcm.setToken(token);
-        console.log(token);
-    })
+//     // Handles user's registration
+//     socket.on('set-token', token => {
+//         fcmToken = token;
+//         fcm.setToken(token);
+//         console.log('Registration token is: ' + token);
+//     })
     
-});
+// });
 
 // Handles notifications from the back-end
 app.post('/pushNotification', function (req, res) {
@@ -50,6 +48,15 @@ app.post('/pushNotification', function (req, res) {
     res.status(200).json('Notification sent!');
 })
 
-server.listen(port, function(){
-    console.log('Socket server listening in http://localhost:' + port);
+app.post('/', function(req, res) {
+    console.log('New message: ', req.body);
+    dialogflow.sendMessage(req.body, fcmToken).then(dialogRes => {
+        res.status(200).json(dialogRes);
+    }).catch(err => {
+        res.status(200).json(clientRes.errorResponse());
+    });
+})
+
+app.listen(port, function(){
+    console.log('Server listening in http://localhost:' + port);
 });
