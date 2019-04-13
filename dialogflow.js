@@ -19,10 +19,11 @@ exports. sendMessage = async function(clientRequest, firebaseToken) {
     const sessionClient = new dialogflow.SessionsClient();
     const sessionPath = sessionClient.sessionPath(projectId, sessionId);
 
+    // Builds request
     const request = dialogflowReq.request();
     request.session = sessionPath;
-    request.queryInput.text.text = clientRequest.body;
-    request.queryParams.payload.fields.token.stringValue = firebaseToken;
+    request.queryInput.text.text = clientRequest.body; // text query
+    request.queryParams.payload.fields.token.stringValue = firebaseToken; // fcm token
     console.log(JSON.stringify(request, null, 2));
 
     // Sends request and logs result
