@@ -18,16 +18,29 @@ app.use(cors());
 
 // Handles notifications from the back-end
 app.post('/pushNotification', function (req, res) {
-    fcm.sendPushNotification(req.body);
-    res.status(200).json('Notification sent!');
+    fcm.sendPushNotification(req.body)
+        .then(() => res.status(200).json('Notification sent!'))
+        .catch(() => res.status(500).json('Something went wrong!'));    
 })
+
+// Handles token registration
+app.post('/fcmToken', (req, res) => {
+    console.log('Received token: ', req.body.token);
+    fcmToken = req.body.token;
+    fcm.setToken(fcmToken)
+        .then(() => res.status(200).json('Token registration successful!'))
+        .catch(() => res.status(500).json('Something went wrong!'));
+});
 
 // Handles messages from client
 app.post('/', function(req, res) {
+    console.log('Received message: ', req.body);
     dialogflow.sendMessage(req.body, fcmToken).then(dialogRes => {
+        console.log(dialogRes);
         res.status(200).json(dialogRes);
     }).catch(err => {
-        res.status(200).json(clientRes.errorResponse());
+        console.log(err);
+        res.status(500).json(clientRes.errorResponse());
     });
 })
 

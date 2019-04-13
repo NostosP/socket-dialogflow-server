@@ -14,7 +14,7 @@ admin.initializeApp({
  * Saves the token of the client
  * @param token
  */
-exports.setToken = (token) => {
+exports.setToken = async (token) => {
     registrationToken = token;
 }
 
@@ -22,7 +22,7 @@ exports.setToken = (token) => {
  * Takes the back-end notification and sends it to the client
  * @param serverNotification
  */
-exports.sendPushNotification = (serverNotification) => {
+exports.sendPushNotification = async (serverNotification) => {
     fcmMessage = fcmMsg.fcmMessage();
     fcmMessage.token = registrationToken;
     fcmMessage.notification.title = serverNotification.title;
@@ -30,9 +30,9 @@ exports.sendPushNotification = (serverNotification) => {
     admin.messaging().send(fcmMessage)
         .then((response) => {
             // Response is a message ID string.
-            console.log('Successfully sent message:', response);
+            console.log('Successfully sent message: ', response);
         })
         .catch((error) => {
-            console.log('Error sending message:', error);
+            console.log('Error sending message: ', error);
         });
 }
