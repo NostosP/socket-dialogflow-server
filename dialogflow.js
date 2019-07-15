@@ -1,7 +1,8 @@
-const dialogflow = require('dialogflow');
-const uuid = require('uuid');
-var clientRes = require('./models/clientResponse'),
-    dialogflowReq = require('./models/dialogflowRequest');
+const dialogflow = require('dialogflow'),
+    uuid = require('uuid'),
+    isEmpty = require('./isEmpty');
+    convertPerformance = require('./convertPerformancePayload')
+var clientRes = require('./models/clientResponse');
 
 // From Firebase console
 const projectId = 'tesiagent-5723f';
@@ -10,43 +11,42 @@ const projectId = 'tesiagent-5723f';
  * Sends a query to the dialogflow agent, and returns the query result.
  * @param clientRequest
  */
-exports. sendMessage = async function(clientRequest, firebaseToken) {
+exports. sendMessage = async function(clientRequest) {
 
     // A unique identifier for the given session
     const sessionId = uuid.v4();
 
     // Creates a new session
-    const sessionClient = new dialogflow.SessionsClient();
-    const sessionPath = sessionClient.sessionPath(projectId, sessionId);
+    const sessionClient = new dialogflow.v2.SessionsClient();
 
-    // Builds request
-    const request = dialogflowReq.request();
-    request.session = sessionPath;
-    request.queryInput.text.text = clientRequest.body; // text query
-    request.queryParams.payload.fields.token.stringValue = firebaseToken; // fcm token
-    console.log(JSON.stringify(request, null, 2));
+    // Builds dialogflow request
+    const formattedSession = sessionClient.sessionPath(projectId, sessionId);
+    const queryInput = {text: {
+            text: clientRequest.body,
+            languageCode: 'en-GB'
+        }
+    };
+    const request = {
+        session: formattedSession,
+        queryInput: queryInput
+    }
 
     // Sends request and logs result
     const responses = await sessionClient.detectIntent(request);
-    console.log('Detected intent');
     const result = responses[0].queryResult;
-    console.log(`  Query: ${result.queryText}`);
-    console.log(`  Response: ${result.fulfillmentText}`);
-    if (result.intent) {
-        console.log(`  Intent: ${result.intent.displayName}`);
-    } else {
-        console.log(`  No intent matched.`);
-    }
+    console.log('Response: ', JSON.stringify(result, null, 2));
 
-    // Constructs the message to send to the client based on the agent intent
+    // Constructs the message to send to the client based on the agent action
     var response = clientRes.response();
-    if (result.intent.displayName == 'Image Intent') {
-        response.type = 'image';
-        response.body = result.fulfillmentMessages[0].card.imageUri;
+    if (result.action === "ComparePerformance") {
+        result.fulfillmentMessages.forEach(m => {
+            response.body.push(convertPerformance.convert(m.payload.fields));
+        }); 
+        response.type = 'performance';
     } else {
         response.body = result.fulfillmentText;
         response.type = 'text';
     }
-    
+
     return response;
 }

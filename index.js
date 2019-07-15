@@ -35,7 +35,7 @@ app.post('/fcmToken', (req, res) => {
 // Handles messages from client
 app.post('/', function(req, res) {
     console.log('Received message: ', req.body);
-    dialogflow.sendMessage(req.body, fcmToken).then(dialogRes => {
+    dialogflow.sendMessage(req.body).then(dialogRes => {
         console.log(dialogRes);
         res.status(200).json(dialogRes);
     }).catch(err => {

@@ -5,7 +5,7 @@ const bot = 'ChatBot';
  */
 exports.response = function() {
     var message = {
-        body: '',
+        body: [],
         from: bot,
         type: ''
     }
