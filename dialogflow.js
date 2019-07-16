@@ -11,7 +11,7 @@ const projectId = 'tesiagent-5723f';
  * Sends a query to the dialogflow agent, and returns the query result.
  * @param clientRequest
  */
-exports. sendMessage = async function(clientRequest) {
+exports. sendMessage = async function(clientRequest, token) {
 
     // A unique identifier for the given session
     const sessionId = uuid.v4();
@@ -26,9 +26,20 @@ exports. sendMessage = async function(clientRequest) {
             languageCode: 'en-GB'
         }
     };
+    const queryParams = {
+        payload: {
+            fields: {
+                token: {
+                    stringValue: token // TODO: will be substituted with username
+                }
+            }
+        }
+    }
+
     const request = {
         session: formattedSession,
-        queryInput: queryInput
+        queryInput: queryInput,
+        queryParams: queryParams
     }
 
     // Sends request and logs result

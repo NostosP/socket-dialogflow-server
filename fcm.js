@@ -24,7 +24,7 @@ exports.setToken = async (token) => {
  */
 exports.sendPushNotification = async (serverNotification) => {
     fcmMessage = fcmMsg.fcmMessage();
-    fcmMessage.token = registrationToken;
+    fcmMessage.token = serverNotification.sendTo;
     fcmMessage.notification.title = serverNotification.title;
     fcmMessage.notification.body = serverNotification.body;
     admin.messaging().send(fcmMessage)

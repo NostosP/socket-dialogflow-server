@@ -17,10 +17,12 @@ app.use(methodOverride());
 app.use(cors());
 
 // Handles notifications from the back-end
-app.post('/pushNotification', function (req, res) {
+app.post('/notification', function (req, res) { 
+    console.log('Sending notification...');
+    console.log(JSON.stringify(req.body));
     fcm.sendPushNotification(req.body)
         .then(() => res.status(200).json('Notification sent!'))
-        .catch(() => res.status(500).json('Something went wrong!'));    
+        .catch(() => res.status(500).json('Something went wrong!'));
 })
 
 // Handles token registration
@@ -35,7 +37,7 @@ app.post('/fcmToken', (req, res) => {
 // Handles messages from client
 app.post('/', function(req, res) {
     console.log('Received message: ', req.body);
-    dialogflow.sendMessage(req.body).then(dialogRes => {
+    dialogflow.sendMessage(req.body, fcmToken).then(dialogRes => {
         console.log(dialogRes);
         res.status(200).json(dialogRes);
     }).catch(err => {
